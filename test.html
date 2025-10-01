@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Converter API Tester</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-top: 0;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        textarea {
+            min-height: 200px;
+            font-family: monospace;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-pdf {
+            background: #e74c3c;
+            color: white;
+        }
+        .btn-pdf:hover {
+            background: #c0392b;
+        }
+        .btn-docx {
+            background: #3498db;
+            color: white;
+        }
+        .btn-docx:hover {
+            background: #2980b9;
+        }
+        .btn-png {
+            background: #2ecc71;
+            color: white;
+        }
+        .btn-png:hover {
+            background: #27ae60;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.loading {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .examples {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        .examples h3 {
+            margin-top: 0;
+        }
+        .example-btn {
+            padding: 8px 16px;
+            margin: 5px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .example-btn:hover {
+            background: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 HTML Converter API Tester</h1>
+        
+        <div class="input-group">
+            <label for="apiUrl">API URL:</label>
+            <input type="text" id="apiUrl" placeholder="https://your-app.onrender.com/convert" value="">
+        </div>
+
+        <div class="input-group">
+            <label for="htmlContent">HTML Content:</label>
+            <textarea id="htmlContent" placeholder="Enter your HTML here..."><!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 40px; }
+        h1 { color: #2c3e50; }
+        p { color: #7f8c8d; line-height: 1.6; }
+        .box { 
+            background: #3498db; 
+            color: white; 
+            padding: 20px; 
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Document</h1>
+    <p>This is a test document created at ${new Date().toLocaleString()}</p>
+    
+    <div class="box">
+        <h2>Highlighted Section</h2>
+        <p>This section has a colored background to test styling.</p>
+    </div>
+    
+    <h2>Sample Table</h2>
+    <table style="width: 100%; border-collapse: collapse;">
+        <tr style="background: #ecf0f1;">
+            <th style="padding: 10px; border: 1px solid #bdc3c7;">Item</th>
+            <th style="padding: 10px; border: 1px solid #bdc3c7;">Value</th>
+        </tr>
+        <tr>
+            <td style="padding: 10px; border: 1px solid #bdc3c7;">Test 1</td>
+            <td style="padding: 10px; border: 1px solid #bdc3c7;">Result 1</td>
+        </tr>
+        <tr>
+            <td style="padding: 10px; border: 1px solid #bdc3c7;">Test 2</td>
+            <td style="padding: 10px; border: 1px solid #bdc3c7;">Result 2</td>
+        </tr>
+    </table>
+</body>
+</html></textarea>
+        </div>
+
+        <div class="examples">
+            <h3>Quick Examples:</h3>
+            <button class="example-btn" onclick="loadExample('simple')">Simple Document</button>
+            <button class="example-btn" onclick="loadExample('invoice')">Invoice</button>
+            <button class="example-btn" onclick="loadExample('social')">Social Media</button>
+        </div>
+
+        <div class="button-group">
+            <button class="btn-pdf" onclick="convert('pdf')">📄 Convert to PDF</button>
+            <button class="btn-docx" onclick="convert('docx')">📝 Convert to DOCX</button>
+            <button class="btn-png" onclick="convert('png')">🖼️ Convert to PNG</button>
+        </div>
+
+        <div id="status" class="status"></div>
+    </div>
+
+    <script>
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+            status.style.display = 'block';
+        }
+
+        async function convert(format) {
+            const apiUrl = document.getElementById('apiUrl').value;
+            const html = document.getElementById('htmlContent').value;
+
+            if (!apiUrl) {
+                showStatus('Please enter your API URL', 'error');
+                return;
+            }
+
+            if (!html) {
+                showStatus('Please enter HTML content', 'error');
+                return;
+            }
+
+            showStatus(`Converting to ${format.toUpperCase()}...`, 'loading');
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        html: html,
+                        format: format,
+                        options: format === 'png' ? { fullPage: true, width: 1200 } : {}
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Conversion failed');
+                }
+
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `document.${format}`;
+                a.click();
+
+                showStatus(`✅ Successfully converted to ${format.toUpperCase()}! File downloaded.`, 'success');
+            } catch (error) {
+                showStatus(`❌ Error: ${error.message}`, 'error');
+                console.error('Conversion error:', error);
+            }
+        }
+
+        function loadExample(type) {
+            const textarea = document.getElementById('htmlContent');
+            
+            const examples = {
+                simple: `<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial; padding: 40px; }
+        h1 { color: #2c3e50; }
+    </style>
+</head>
+<body>
+    <h1>Simple Document</h1>
+    <p>This is a very simple document for testing.</p>
+    <p>Created: ${new Date().toLocaleDateString()}</p>
+</body>
+</html>`,
+                
+                invoice: `<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial; padding: 40px; }
+        .header { border-bottom: 3px solid #3498db; padding-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #f5f5f5; font-weight: bold; }
+        .total { font-size: 20px; font-weight: bold; text-align: right; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>INVOICE #12345</h1>
+        <p>Date: ${new Date().toLocaleDateString()}</p>
+    </div>
+    
+    <p><strong>Bill To:</strong><br>John Doe<br>123 Main Street</p>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Web Design</td>
+                <td>1</td>
+                <td>$500</td>
+                <td>$500</td>
+            </tr>
+            <tr>
+                <td>Development</td>
+                <td>10 hrs</td>
+                <td>$100/hr</td>
+                <td>$1000</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <div class="total">TOTAL: $1,500.00</div>
+</body>
+</html>`,
+                
+                social: `<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1200px;
+            height: 630px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+        }
+        .content {
+            text-align: center;
+            color: white;
+            padding: 60px;
+        }
+        h1 {
+            font-size: 72px;
+            margin: 0 0 20px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        p {
+            font-size: 36px;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <h1>Hello World!</h1>
+        <p>This is a social media post</p>
+    </div>
+</body>
+</html>`
+            };
+
+            textarea.value = examples[type];
+        }
+
+        // Auto-detect localhost for testing
+        if (window.location.hostname === 'localhost') {
+            document.getElementById('apiUrl').value = 'http://localhost:3000/convert';
+        }
+    </script>
+</body>
+</html>
